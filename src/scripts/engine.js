@@ -31,12 +31,12 @@ const cardData = [
         id: 0,
         name: "Blue Eyes White Dragon",
         type: "Paper",
-        img: `${pathImages}+"dragon.png`,
+        img: `${pathImages}dragon.png`,
         WinOf: [1],
         LoseTo: [2],
     },
     {
-        id: 2,
+        id: 1,
         name: "Exodia",
         type: "Scissors",
         img: `${pathImages}exodia.png`,
@@ -44,12 +44,12 @@ const cardData = [
         LoseTo: [1],
     },
     {
-        id: 0,
+        id: 2,
         name: "Blue Eyes White Dragon",
         type: "Paper",
-        img: `${pathImages}magican.png`,
+        img: `${pathImages}magician.png`,
         WinOf: [1],
-        LoseTo: [2],
+        LoseTo: [0],
     },
 ]
 
@@ -62,7 +62,7 @@ async function getRadomCardId() {
     return cardData[randomIndex].id;
 }
 
-async function hiddenCardsDetails(){
+async function hiddenCardsDetails() {
     state.cardSprite.avatar.src = "";
     state.cardSprite.name.innerText = "";
     state.cardSprite.type.innerText = "";
@@ -73,8 +73,7 @@ async function setCardsField(cardId) {
 
     let computerCardId = await getRadomCardId();
 
-    state.fieldCards.player.display = "block";
-    state.fieldCards.computer.display = "block";
+    await showHiddenCardsFieldsImages(true);
 
     await hiddenCardsDetails();
 
@@ -113,13 +112,13 @@ async function createCardImage(randomIdCard, fieldSide) {
     cardImage.setAttribute("data-id", randomIdCard);
     cardImage.classList.add("card");
 
-    if (fieldSide === playerSides.player1) {
+    if (fieldSide === state.playerSides.player1) {
         cardImage.addEventListener("mouseover", () => {
             drawSelectedCard(randomIdCard);
         });
 
         cardImage.addEventListener("click", () => {
-            selectCardsField(cardImage.getAttribute("data-id"));
+            setCardsField(cardImage.getAttribute("data-id"));
         });
     }
 
@@ -159,6 +158,19 @@ async function checkDuelResults(playerCardId, computerCardId) {
     return duelResults;
 }
 
+async function showHiddenCardsFieldsImages(value) {
+    if (value === true) {
+        state.fieldCards.player.style.display = "block";
+        state.fieldCards.computer.style.display = "block";
+    }
+
+    if (value === false) {
+        state.fieldCards.computer.style.display = "none";
+        state.fieldCards.player.style.display = "none";
+
+    }
+}
+
 async function drawCards(cardNumbers, fieldSide) {
     for (let i = 0; i < cardNumbers; i++) {
         const randomIdCard = await getRadomCardId()
@@ -175,12 +187,13 @@ async function drawSelectedCard(index) {
 }
 
 function init() {
-    state.fieldCards.player.style.display = "none";
-    state.fieldCards.computer.style.display = "none";
 
 
-    drawCards(5, playerSides.player1);
-    drawCards(5, playerSides.computer);
+    showHiddenCardsFieldsImages(false);
+
+
+    drawCards(5, state.playerSides.player1);
+    drawCards(5, state.playerSides.computer);
 
     const bgm = document.getElementById("bgm");
     bgm.play();
